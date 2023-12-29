@@ -1,0 +1,55 @@
+// Copyright 2008 Google Inc.
+// All Rights Reserved.
+/**
+ * @fileoverview Coordinate Display Control
+ *
+ * @extends Control
+ *
+ * @author  ( )
+ */
+
+/**
+ * Coordinate Display Constructor
+ * @unrestricted
+ */
+class CoordDisplay {
+  /**
+   * @return {Object} The control
+   */
+  constructor() {
+    this.initialize();
+    return this;
+  }
+
+  /**
+   * Initialize function
+   * @return {Object} The CoordDisplay Control
+   */
+  initialize() {
+    this.containerDiv = document.createElement('div');
+    var containerDiv = this.containerDiv;
+    containerDiv.innerHTML = '<input type="text" id="skyra" value="" ' +
+        'readonly="true" class="fakeDivDown">' +
+        '&nbsp;<input type="text" id="skydec" value="" ' +
+        'readonly="true" class="fakeDivDown">' +
+        '&nbsp;&nbsp;<input type="text" id="skystartitle" ' +
+        'value="" readonly="true" class="fakeDivDownB">';
+    // TODO(cmhubertchen): This is doing nothing in Chrome.
+    // google.maps.event.addListener(map, "mouseout", eraseInfo);
+    google.maps.event.addListener(map, 'mouseover', displayInfo);
+    google.maps.event.addListener(map, 'mousemove', displayInfo);
+    return containerDiv;
+  }
+
+  getContainer() {
+    return this.containerDiv;
+  }
+
+  /**
+   * Returns the default position for the Coverage control
+   * @return {ControlPosition} The Coverage control default position.
+   */
+  getDefaultPosition() {
+    return google.maps.ControlPosition.BOTTOM_LEFT;
+  }
+}

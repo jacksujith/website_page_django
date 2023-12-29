@@ -1,0 +1,411 @@
+/**
+  * @fileoverview Some function for Sky Maps
+  */
+
+function deleteKml() {
+  if (kmlOverlay !== null) {
+    kmlOverlay.setMap(null);
+    var loadedKml = document.getElementById('loadedKml');
+    loadedKml.innerHTML = '';
+  }
+}
+
+/*
+  changeCenter: change center to default center
+
+  @param {Mixed} obj google.maps.KmlLayer Object
+  @return {void}
+*/
+function changeCenter(obj, opt_customZoom) {
+  var center = obj.getDefaultViewport().getCenter();
+  var zoom = opt_customZoom || 7;
+  map.setCenter(new google.maps.LatLng(center.lat(), center.lng()));
+  map.setZoom(zoom);
+}
+
+/*
+  updateKml: loads kml
+
+  @param {String} opt_kml KML|Z URL
+  @param {Boolean} opt_justChangeCenter Just change the center to default position
+  @return {void}
+*/
+function updateKml(kml, opt_justChangeCenter, opt_displayName, opt_isPlanet, opt_customZoomPlanet) {
+  if (opt_justChangeCenter) {
+    XmlHttp.downloadUrl(kml, function(html, response) {
+      if (parseInt(response) == 200) {
+        var latLngMatch = html.match(
+            /<lat_lng lat="(-?\d+\.?\d*)" lng="(-?\d+\.?\d*)"\/>/i);
+        map.setCenter(
+            new google.maps.LatLng(
+                +latLngMatch[1], INVERT_CENTER_SEARCH * +latLngMatch[2]));
+        map.setZoom(10);
+      }
+    });
+  } else {
+    if (opt_isPlanet) {
+      if (planetKmlOverlay !== null) {
+        planetKmlOverlay.setMap(null);
+      }
+      planetKmlOverlay = new google.maps.KmlLayer({map: map, url: kml});
+      google.maps.event.addListenerOnce(
+          planetKmlOverlay, 'status_changed', function() {
+            if (planetKmlOverlay.getStatus() == google.maps.KmlLayerStatus.OK) {
+              changeCenter(planetKmlOverlay, opt_customZoomPlanet);
+            }
+          });
+      return;
+    }
+    if (kmlOverlay !== null) {
+      kmlOverlay.setMap(null);
+    }
+    kmlOverlay = new google.maps.KmlLayer({map: map, url: kml});
+    google.maps.event.addListenerOnce(kmlOverlay, 'status_changed', function() {
+      if (kmlOverlay.getStatus() == google.maps.KmlLayerStatus.OK) {
+        try {
+          changeCenter(kmlOverlay);
+          try {
+            var loadedKml = document.getElementById('loadedKml');
+            var qtbWidths =
+                getPosition(document.getElementById('qtbIRAS')).width +
+                getPosition(document.getElementById('qtbWMAP')).width +
+                getPosition(document.getElementById('qtbCassini')).width;
+            if (opt_displayName) {
+              var kmlName = opt_displayName;
+            } else {
+              var kmlName = kml.match(/\/([^\/]+\.km[l|z])/);
+              kmlName = kmlName[1];
+            }
+            loadedKml.innerHTML = kmlName + ' <img src="' + iconFolder +
+                'close.gif" style="cursor:pointer;" onClick="deleteKml();">';
+            var myWidth = getPosition(loadedKml).width;
+            loadedKml.style.left = px(qtbWidths - myWidth);
+          } catch (ex) {
+            // reduced versions won't have close
+          }
+        } catch (ex) {
+        }
+      } else {
+        alert('Error loading Kml');
+      }
+    });
+  }
+}
+
+/*
+  doSearch: if searching kml / kmz just add it!
+
+  @param {String} The id of the HTMLTextElement which value we are searching
+  @return {void}
+*/
+function clickSearch(textToSearch) {
+  doSearch(null, textToSearch);
+}
+function doSearch(searchText, opt_query) {
+  try {
+    var query = document.getElementById(searchText).value;
+  } catch (ex) {
+    var query = opt_query || '';
+  }
+  if (/^(-?\d+:\d+:[\d\.]+)\s*,\s*(-?\d+:\d+:[\d\.]+)$/.exec(query)) {
+    var matches = query.match(/^(-?\d+:\d+:[\d\.]+)\s*,\s*(-?\d+:\d+:[\d\.]+)$/);
+    var lng = - raToLng(matches[1]);
+    var lat = decToLat(matches[2]);
+    query = lat + ',' + lng;
+  }
+  function encodeHtml(html) {
+    var encoded = document.createElement('div');
+    var textNode = document.createTextNode(html);
+    encoded.appendChild(textNode);
+    return encoded.innerHTML.replace(/\"/g, '&quot;').replace(/\'/g, '&#039;');
+  }
+  function fakeLink(oneMatch) {
+    var rname = '';  // Pretend we got nothing until we manage to match stuff.
+    var match = /<title>([^<>]+)<\/title>/i.exec(oneMatch);
+    if (match) {
+      var encodedName = match[1];
+      if (/&lt;/.exec(encodedName)) {
+        // The name contains encoded HTML. This is a multi-result response and
+        // we expect an <a> link.
+        // Decode HTML entities.
+        decoder = document.createElement('div');
+        decoder.innerHTML = encodedName;
+        var decodedName = (decoder.innerText || decoder.textContent);
+        // Just get the name and discard the existing link; we're replacing it.
+        var extractedName = /<a[^>]*>([^<>]+)<\/a>/.exec(decodedName);
+        if (extractedName) {
+          rname = extractedName[1];
+        }
+      } else {
+        // No embedded <a> link. This is a single result.
+        rname = encodedName;
+      }
+    }
+    var urlName = encodeURIComponent(rname);
+    var htmlName = encodeHtml(rname);
+    var searchUrl = baseSearchUrl + urlName;
+    return '<tr><td>' +
+           '<a href="#" style="color:black;font-size:11px;" onClick="javascript:updateKml(\'' + searchUrl + '\', true);">' + rname + '</a></td></tr>';
+  }
+
+  var resultStart = '<table width="100%" cellspacing="0" cellpadding="0">';
+  var results = '';
+  var noMatches = '<tr><td style="font-size:11px"><font color=\'#000\'>No results</font></td></tr>';
+  var resultEnd = '</table>';
+
+  if (/\.km[l|z]$/.test(query)) {
+    updateKml(query);
+  } else {
+    var floatingBox;
+    XmlHttp.downloadUrl(baseSearchUrl + encodeURIComponent(query),
+                        function(html, resp) {
+      if (parseInt(resp) == 200) {
+        var didyoumean = html.match(/<Folder>/gi);
+        var matches = html.match(/<title>([^>]+)<\/title>/gi);
+        if (matches === null) {
+          var ntmatch = /<NetworkLink><name>([^>]+)<\/name>.*?<href>([^<]+)/gi.exec(html);
+          if (ntmatch === null) {
+            results = noMatches;
+          } else {
+            results = '<tr><td style="font-size:11px">- 1 Results for <b>' + encodeHtml(query) + '</b> -</td></tr>';
+            results += '<tr><td style="font-size:11px"><font color=\'#000\'>' + ntmatch[1] + '</font></td></tr>';
+            updateKml(ntmatch[2], false, ntmatch[1]);
+          }
+        } else {
+          results = '<tr><td style="font-size:11px">- ' + matches.length.toString() + ' Results for <b>' + encodeHtml(query) + '</b> -</td></tr>';
+          for (var i = 0; i < matches.length; i++)
+            results += fakeLink(matches[i]);
+          if (matches.length == 1 && didyoumean === null) {
+            // only load if there is one match and it's not a suggestion
+            updateKml(baseSearchUrl + encodeURIComponent(query), true);
+          }
+        }
+        floatingBox = resultStart + results + resultEnd;
+        var floatingDiv = document.getElementById('searchResults');
+        var closeSearch = document.getElementById('closeSearch');
+        var searchBox = document.getElementById('searchtext');
+        var positionBox = getPosition(searchBox);
+        floatingDiv.innerHTML = floatingBox;
+        floatingDiv.style.width = px(positionBox.width);
+        floatingDiv.style.left = px(positionBox.left);
+        floatingDiv.style.top = px(positionBox.top + positionBox.height);
+        closeSearch.style.top = px(0);
+        closeSearch.style.left = px(
+            (('left' == 'left') ? positionBox.width : 12) - 12);
+        closeSearch.style.display = floatingDiv.style.display = 'block';
+        closeSearch.style.visibility = floatingDiv.style.visibility = 'visible';
+        floatingDiv.appendChild(closeSearch);
+      }
+      else {
+        alert('Search is not responding, sorry...');
+      }
+    });
+  }
+}
+
+/*
+  eraseInfo: delete information when out of map
+
+  @return {void}
+*/
+function eraseInfo() {
+  displayInfo(map.getCenter(), false, ' ');
+}
+
+/*
+  latToDec: latitude to declination
+
+  @param {Number} latitude
+  @return {Number} declination for this latitude
+*/
+function latToDec(latitude) {
+  if (latitude < 0) return '-' + latToDec(- latitude);
+  var DEC = Math.floor(latitude).toString() + '° ';
+  latitude = (latitude - Math.floor(latitude)) * 60;
+  DEC += Math.floor(latitude).toString() + '\' ';
+  latitude = (latitude - Math.floor(latitude)) * 60;
+  DEC += latitude.toFixed(1) + '"';
+  return DEC;
+}
+
+/*
+  decToLat: declination to latitude
+
+  @param {Number} dec
+  @return {Number} latitude for this declination
+*/
+function decToLat(dec) {
+  if (dec[0] == '-') return '-' + decToLat(dec.substring(1));
+  var decSplit = dec.split(':');
+  var latitude = parseFloat(decSplit[0]) +
+                 parseFloat(decSplit[1]) / 60.0 +
+                 parseFloat(decSplit[2]) / 3600.0;
+  return latitude;
+}
+
+/*
+  lngToRa: longitude to right ascension
+
+  @param {Number} longitude
+  @return {Number} right ascension
+*/
+function lngToRa(longitude) {
+  longitude = (- longitude + 180) / 15;
+  var RA = Math.floor(longitude).toString() + 'h ';
+  longitude = (longitude - Math.floor(longitude)) * 60;
+  RA += Math.floor(longitude).toString() + 'm ';
+  longitude = (longitude - Math.floor(longitude)) * 60;
+  RA += Math.floor(longitude).toFixed(1) + 's';
+  return RA;
+}
+
+/*
+  raToLng: right ascension to longitude
+
+  @param {Number} right ascension
+  @return {Number} longitude
+*/
+function raToLng(ra) {
+  var raSplit = ra.split(':');
+  var longitude = parseFloat(raSplit[0]) +
+                  parseFloat(raSplit[1]) / 60.0 +
+                  parseFloat(raSplit[2]) / 3600.0;
+  return - (longitude * 15 - 180);
+}
+
+/*
+  displayInfo: display information of the mouse pointer point
+
+  @param {google.maps.MouseEvent} Mouse event triggering this event listener.
+  @return {void}
+*/
+function displayInfo(mouseEvent) {
+  var skydec = document.getElementById('skydec');
+  var skyra = document.getElementById('skyra');
+  skydec.value = latToDec(mouseEvent.latLng.lat());
+  skyra.value = lngToRa(mouseEvent.latLng.lng());
+}
+
+/*
+  getSkyImageMapType: create an ImageMapType that will show the sky images.
+
+  @return {ImageMapType}
+*/
+function getSkyImageMapType() {
+  // TODO(cmhubertchen): Move copyrightCtl elsewhere; it is here b/c it was
+  // here in Maps API v2 as a parameter for the GTileLayer constructor.
+  // Left here for easier code review and history tracking.
+  // <div> options are from Mars.
+  var copyrightCtl = document.createElement('div');
+  copyrightCtl.style.height = '1.3em';
+  copyrightCtl.style.fontSize = 'small';
+  copyrightCtl.style.color = 'white';
+  copyrightCtl.appendChild(document.createTextNode(skyCopyright));
+  map.controls[google.maps.ControlPosition.BOTTOM_RIGHT].push(copyrightCtl);
+  var skyImageMapTypeOptions = {
+    getTileUrl: function(point, zoom) {
+      var base = jpegBaseURL;
+      var bound = Math.pow(2, zoom);
+      var x = point.x;
+      var y = point.y;
+      // Don't repeat across y-axis (vertically).
+      if (y < 0 || y >= bound) {
+        return null;
+      }
+      // Repeat across x-axis.
+      if (x < 0 || x >= bound) {
+        x = (x % bound + bound) % bound;
+      }
+      var url = base + x + '_' + y + '_' + zoom + '.jpg';
+      return url;
+    },
+    tileSize: new google.maps.Size(256, 256),
+    maxZoom: SkyZoomLevels - 1,
+    name: 'Sky',
+    opacity: 1
+    // TODO(cmhubertchen): No Maps API v3 equivalent:
+    // errorMessage: 'No data'
+  };
+  var skyImageMapType = new google.maps.ImageMapType(skyImageMapTypeOptions);
+  return skyImageMapType;
+}
+
+function generateSkyMap(map, skyImageMapType) {
+  // TODO(cmhubertchen): No Maps API v3 equivalent:
+  // skyMapType.getTextColor = function() { return 'white'; }
+  // skyMapType.getLinkColor = function() { return '#aaaaee'; }
+  // skyMapType.getErrorMessage = function() { return 'No imagery available at this zoom level. Try <a href="javascript:gotoInit();">zooming out</a>.'; }
+
+  map.mapTypes.set('Sky', skyImageMapType);
+}
+
+// Resize the UI components because something's been opened or closed
+// Based on Google's Moon resizeMap
+function resizeMap() {
+  var map = document.getElementById('map');
+  var slider = document.getElementById('slider');
+  var infoTab = document.getElementById('infoTab');
+
+  /* compute our expected state */
+  var mapheight = getWindowHeight() - getPosition(map).top;
+  var mapwidth = getWindowWidth();
+  var mapleft = 0;
+
+  /* try setting everything's size: */
+  map.style.height = px(mapheight - (slider.style.display == 'none' ? 0 : 89));
+  map.style.width = px(mapwidth);
+  map.style.left = px(mapleft);
+  infoTab.style.left = px(mapleft);
+  slider.style.left = px(mapleft + parseInt(getPosition(infoTab).width));
+  slider.style.width = px(mapwidth - parseInt(getPosition(infoTab).width));
+  checkMapSize();
+}
+
+// Following function were copied from some Google Moon files
+// See google moon for more information
+
+// Gets the position of a html element
+function getPosition(elem) {
+  var offset = 0;
+  var x = 0; y = 0;
+  var w = elem.offsetWidth;
+  var h = elem.offsetHeight;
+  while (elem != null) {
+    y += elem.offsetTop;
+    x += elem.offsetLeft;
+    elem = elem.offsetParent;
+  }
+  var out = { top: y, left: x, width: w, height: h};
+  return out;
+}
+
+// Returns number + "px"
+function px(numPixels) { return Math.round(numPixels) + 'px'; }
+
+// Gets page size as a Size
+function getPageSize() {
+  return new google.maps.Size(
+      window.innerWidth ||
+          (document.documentElement && document.documentElement.clientWidth) ||
+          document.body.clientWidth,
+      window.innerHeight ||
+          (document.documentElement && document.documentElement.clientHeight) ||
+          document.body.clientHeight);
+}
+
+// Gets page height
+function getWindowHeight() {
+  return getPageSize().height;
+}
+
+// Gets page width
+function getWindowWidth() {
+  return getPageSize().width;
+}
+
+function hideResults() {
+  var sr = document.getElementById('searchResults');
+  var cs = document.getElementById('closeSearch');
+  sr.style.display = cs.style.display = 'none';
+  sr.style.visibility = cs.style.visibility = 'hidden';
+}

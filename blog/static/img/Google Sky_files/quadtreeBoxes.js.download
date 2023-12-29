@@ -1,0 +1,68 @@
+// Copyright 2008 Google Inc.
+// All Rights Reserved.
+/**
+ * @fileoverview Quadtree Boxes Control
+ *
+ * @extends Control
+ *
+ * @author  ( )
+ */
+
+/**
+ * QuadtreeBoxes Constructor
+ * @unrestricted
+ */
+class QuadtreeBoxes {
+  /**
+   * @return {Object} The control
+   */
+  constructor() {
+    this.initialize();
+    return this;
+  }
+
+  /**
+   * Initialize function
+   */
+  initialize() {
+    this.containerDiv = document.createElement('div');
+    this.containerDiv.innerHTML = '<table cellpadding="0" border="0"><tr>' +
+        '<td><span id="qtbIRAS" class="quadtreeBoxButton" onMouseOver="" onClick="skyLayerManager.cOverlay(\'IRAS\', {maxZoom: 7});">Infrared</span></td>' +
+        '<td><span id="qtbWMAP" class="quadtreeBoxButton" onMouseOver="" onClick="skyLayerManager.cOverlay(\'WMAP\', {maxZoom: 7});">Microwave</span></td>' +
+        '<td><span id="qtbCassini" class="quadtreeBoxButton" onMouseOver="" onClick="skyLayerManager.cOverlay(\'Cassini\', {maxZoom: 7});">Historical</span></td>' +
+        '</tr>' +
+        '<tr>' +
+        '<td valign="top"><span id="_trIRAS" style="visibility:hidden;display:none;"><div class="slider" style="width:100%;" id="_slIRAS"></div><input class="slider-input" style="display:none;visibility:hidden;" id="_slIRASv"><span></td>' +
+        '<td valign="top"><span id="_trWMAP" style="visibility:hidden;display:none;"><div class="slider" style="width:100%;" id="_slWMAP"></div><input class="slider-input" style="display:none;visibility:hidden;" id="_slWMAPv"><span></td>' +
+        '<td valign="top"><span id="_trCassini" style="visibility:hidden;display:none;"><div class="slider" style="width:100%;" id="_slCassini"></div><input class="slider-input" style="display:none;visibility:hidden;" id="_slCassiniv"><span></td>' +
+        '</tr><tr>' +
+        '<td colspan="3" align="right" valign="top" style="color:#ffaa00;"><span style="position:absolute;top:50px;left:0px;width:100%;" id="loadedKml"></span></td></tr>' +
+        '</table>';
+    // Need to append the containerDiv to something in order to get it back with
+    // document.getElementById later.  google.maps.Map.controls[...].push(...)
+    // does not suffice.
+    document.getElementById('slider').appendChild(this.containerDiv);
+
+    var overlayNames = {4: 'IRAS', 5: 'WMAP', 6: 'Cassini'};
+    for (var i = 4; i < 7; i++) {
+      var sl = document.getElementById('_sl' + overlayNames[i]);
+      var slv = document.getElementById('_sl' + overlayNames[i] + 'v');
+      var s = new Slider(sl, slv, 'horizontal', null, i);
+      s.setMaximum(100);
+      s.setValue(0);
+      s.onchange = function() {
+        skyLayerManager.setOpacity(
+            overlayNames[this._oIndex], this.getValue(), {maxZoom: 7});
+      };
+      skyLayerManager.setSlider(overlayNames[i], s);
+    }
+  }
+
+  getContainer() {
+    return this.containerDiv;
+  }
+
+  getDefaultPosition() {
+    return google.maps.ControlPosition.TOP_RIGHT;
+  }
+}

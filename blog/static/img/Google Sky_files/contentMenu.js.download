@@ -1,0 +1,488 @@
+// Copyright 2008 Google Inc.
+// All Rights Reserved.
+/**
+  * @fileoverview Content Menu Generator
+  * 
+  * @author  ( )
+  */
+var currentMenuSlide = 1;
+var lastClickedMenu = [-1, -1];
+var skyContentMenu = {};
+skyContentMenu[0] = undefined; //override
+skyContentMenu[-1] = {};
+skyContentMenu[-1]['headText'] = '<p><table id="realKmlLayerTable" width="100%" style="border: #77a solid 1px;" cellspacing="0" cellpadding="0"></table></p>';
+skyContentMenu[-1]['footText'] = '';
+skyContentMenu[-1]['evalCode'] = 'copyTableInAllBrowsers(\'kmlLayerTable\', \'realKmlLayerTable\');';
+skyContentMenu[1] = {};
+skyContentMenu[1]['headText'] = '<span id="sliderHeader">' + 
+                                '<span style="color:white;font-size:14px;"><b>Home &raquo; <br/></span></b></span><br/>' + 
+                                '</span>';
+// New feature request, change menu when activating overlay sideeffect:
+// If you change the order here, you have to change it in quadtreeBoxes (id's are used).
+skyContentMenu[1]['options'] = [{thumb: [thumbsFolder + 'planets.jpg', '70px', '70px'],
+                                 text: 'Solar System', 
+                                 subMenu: 2, 
+                                 isSlideShow: true, 
+                                 notext: true,
+                                 loadFrom: './menu/planets.js', 
+                                 slideHtml: '', 
+                                 checkbox: false}, 
+                                 {thumb: [thumbsFolder + 'Constellations_thumbnail.jpg', '70px', '70px'],
+                                 text: 'Constellations', 
+                                 subMenu: 3,
+                                 isSlideShow: true, 
+                                 notext: true,
+                                 gotoZoom: 4, 
+                                 loadFrom: './menu/constellations.js', 
+                                 slideHtml: '', 
+                                 checkbox: false}];
+skyContentMenu[1]['options'].push({thumb: [thumbsFolder + 'HST_thumbnail.jpg', '70px', '70px'],
+                                   text: 'Hubble Showcase', 
+                                   subMenu: 16, 
+                                   loadFrom: './menu/HST/HubbleShowcase.js', 
+                                   jsonFolder: 'HST2', 
+                                   isSlideShow: true, 
+                                   notext: true,
+                                   slideHtml: '', 
+                                   checkbox: false});
+skyContentMenu[1]['options'].push({thumb: [thumbsFolder + 'Backyard_thumbnail.jpg', '70px', '70px'],
+                                   text: 'Backyard Astronomy', 
+                                   subMenu: 7, 
+                                   loadFrom: './menu/Messier.js', 
+                                   slideHtml: '', 
+                                   isSlideShow: true, 
+                                   notext: true,
+                                   gotoZoom: 12, 
+                                   checkbox: false});
+skyContentMenu[1]['options'].push({thumb: [thumbsFolder + 'CHANDRA_Xray_thumbnail.jpg', '70px', '70px'],
+                                   text: 'Chandra X-Ray Showcase', 
+                                   subMenu: 8, 
+                                   loadFrom: './menu/Chandra/chandra.js', 
+                                   jsonFolder: 'chandra', 
+                                   slideHtml: '<table><tr><td><font color="white">Opacity:</font></td>' + 
+                                              '<td width="100%;"><div class="slider" style="width:100%" id="_slChandraXO"></div><input class="slider-input" style="display:none;visibility:hidden;" id="_slChandraXOv"></td>' + 
+                                              '</tr><table>', 
+                                   isSlideShow: true, 
+                                   notext: true,
+                                   gotoZoom: 12, 
+                                   checkbox: false});
+skyContentMenu[1]['options'].push({thumb: [thumbsFolder + 'GALEX_thumbnail.jpg', '70px', '70px'],
+                                   text: 'GALEX Ultraviolet Showcase', 
+                                   subMenu: 9, 
+                                   loadFrom: './menu/Galex/galex.js', 
+                                   jsonFolder: 'galex', 
+                                   slideHtml: '<table><tr><td><font color="white">Opacity:</font></td><td width="100%;"><div class="slider" style="width:100%" id="_slGalex"></div><input class="slider-input" style="display:none;visibility:hidden;" id="_slGalexv"></td></tr><table>', 
+                                   isSlideShow: true, 
+                                   notext: true,
+                                   gotoZoom: 12, 
+                                   checkbox: false});
+skyContentMenu[1]['options'].push({thumb: [thumbsFolder + 'SPITZER_thumbnail.jpg', '70px', '70px'],
+                                   text: 'Spitzer Infrared Showcase', 
+                                   subMenu: 10, 
+                                   loadFrom: './menu/Spitzer/spitzer.js', 
+                                   jsonFolder: 'spitzer', 
+                                   slideHtml: '<table><tr><td><font color="white">Opacity:</font></td><td width="100%;"><div class="slider" style="width:100%" id="_slSpitzer"></div><input class="slider-input" style="display:none;visibility:hidden;" id="_slSpitzerv"></td></tr><table>', 
+                                   isSlideShow: true, 
+                                   notext: true,
+                                   gotoZoom: 12, 
+                                   checkbox: false});
+skyContentMenu[1]['options'].push({thumb: [thumbsFolder + 'EarthAndSky_thumbnail.jpg', '70px', '70px'],
+                                   text: 'Earth &amp; Sky Podcasts', 
+                                   subMenu: 6, 
+                                   loadFrom: './menu/earth_and_sky_podcasts.js', 
+                                   jsonFolder: 'earthsky', 
+                                   isSlideShow: true, 
+                                   notext: true,
+                                   slideHtml: '', 
+                                   checkbox: false});
+skyContentMenu[1]['footText'] = '';
+skyContentMenu[1]['evalCode'] = 'disableCheckOverlays();';
+function disableCheckOverlays() {
+  try {
+    var overlays = ['Spitzer', 'ChandraXO', 'Galex'];
+    for (var i = 0; i < overlays.length; i++) {
+      if (skyLayerManager.getOverlayVisibility(overlays[i]))
+        skyLayerManager.cOverlay(overlays[i]);
+    }
+  } catch(ex) { }
+}
+function checkChange(chk, mIndex, oIndex) {
+  try {
+    skyContentMenu[mIndex]['options'][oIndex].checkboxCallback(chk.checked);
+  } catch(ex) {
+    skyContentMenu[mIndex]['options'][oIndex].checkboxCallback();
+  }
+}
+function opacityChange(txt, mIndex, oIndex, opt_opac) {
+  if (txt === null) {
+    var opac = opt_opac;
+  } else {
+    var opac = parseInt(txt.value);
+    if (opac < 0) opac = 0;
+    if (opac > 100) opac = 100;
+  }
+  skyContentMenu[mIndex]['options'][oIndex].changeOpacity(opac);
+}
+function clickedMenu(mIndex, oIndex) {
+  var thisOpt = skyContentMenu[mIndex]['options'][oIndex];
+  var submenu = thisOpt.subMenu;
+  var loadFrom = thisOpt.loadFrom;
+  var thumbnailGenerator = null;
+  var thumbnailSize = [];
+  var notextValue = false;
+  var searchBaseDir = '';
+  if (submenu) {
+    if (loadFrom) {
+      lastClickedMenu[0] = mIndex; lastClickedMenu[1] = oIndex;
+    }
+    if (loadFrom && !skyContentMenu[submenu]) {
+      XmlHttp.downloadUrl(loadFrom, function(html, response) {
+        if (parseInt(response) == 200) {
+          skyContentMenu[submenu] = {};
+          skyContentMenu[submenu]['headText'] = '';
+          skyContentMenu[submenu]['options'] = [];
+          if (thisOpt.jsonFolder) {
+            var json = eval('(' + html + ')');
+            var jsoptions = json['markers'];
+            var folder = thumbsFolder + thisOpt.jsonFolder + '/';
+            var secondLevelMenu = '';
+            if (thisOpt.secondLevel) 
+              secondLevelMenu = '&nbsp;&nbsp;&nbsp;<span class=\'fakeLinkWS\' onClick=\'createSlide(' + thisOpt.secondLevel + ');\'>Hubble &raquo;</span>' + ((/msie/ig.test(navigator.userAgent.toLowerCase())) ? '' : '<br/>');
+            skyContentMenu[submenu]['headText'] = '<span id="sliderHeader">' + 
+                                                  '<span class=\'fakeLinkWS\' onClick=\'createSlide(1);\'>Home &raquo;</span><br/>' + 
+                                                  secondLevelMenu + 
+                                                  '<font size="3" color="white"><b>&nbsp;&nbsp;&nbsp;' + 
+                                                  ((secondLevelMenu != '') ? '&nbsp;&nbsp;&nbsp;' : '') + json['title'] + 
+                                                  '</b></font></span><br/>' + thisOpt.slideHtml;
+            for (var i = 0; i < jsoptions.length; i++) {
+              try {
+                var jsoption = jsoptions[i];
+                var newStaticOption = {notext: true, checkbox: false,
+                                       zoomCallback: function() {
+                                         var point = new google.maps.LatLng(
+                                             this.latitude, - this.longitude);
+                                         map.setCenter(point);
+                                         map.setZoom(this.gotoZoom);
+                                         var html = '<div class="infoScrollBig" id="infoScrollDiv">' + this.infoWindowText + '</div>';
+                                         var infoWindow = new google.maps.InfoWindow({
+                                           content: html,
+                                           maxWidth: 400,
+                                           position: point
+                                         });
+                                         infoWindow.open(map);
+                                         try {
+                                           var position = getPosition(map.getContainer());
+                                           var scrollDivObject = document.getElementById('infoScrollDiv');
+                                           var temphei = getPosition(scrollDivObject).height;
+                                           var tempwid = getPosition(scrollDivObject).width;
+                                           var maxheight = Math.min(position.height - 200, 500);
+                                           var maxwidth = position.width - 200;
+                                           if (temphei > maxheight) scrollDivObject.style.height = px(maxheight);
+                                           if (tempwid > maxwidth) scrollDivObject.style.width = px(maxwidth);
+                                         } catch (ex) {
+                                         }
+                                       }};
+                if (/^http/i.exec(jsoption['thumbnail']))
+                  newStaticOption.thumb = [jsoption['thumbnail'], '70px', '70px'];
+                else 
+                  newStaticOption.thumb = [folder + jsoption['thumbnail'], '70px', '70px'];
+                newStaticOption.text = jsoption['name'];
+                newStaticOption.longitude = parseFloat(jsoption['zoomLongitude']);
+                newStaticOption.latitude = parseFloat(jsoption['zoomLatitude']);
+                newStaticOption.gotoZoom = parseInt(jsoption['zoomLevel']);
+                if ('left' == 'right' && (/msie/ig.test(navigator.userAgent.toLowerCase())))
+                  newStaticOption.infoWindowText = '<div style="position:relative;left:0px;top:0px;width:100%;">' + jsoption['desc'] + '</div>';
+                else 
+                  newStaticOption.infoWindowText = jsoption['desc'];
+                skyContentMenu[submenu]['options'].push(newStaticOption);
+              } catch (ex) { 
+                // For some reason internet explorer length seems to be more than the correct value
+              }
+            }
+          } else {
+            var lines = html.split('\n');
+            for (var i = 0; i < lines.length; i++) {
+              if (lines[i][0] == "#") continue;
+              if (lines[i].substring(0, 8) == "HEADER: ") {
+                skyContentMenu[submenu]['headText'] += lines[i].substring(8);
+                continue;
+              }
+              if (lines[i].substring(0, 13) == "ORTHUMBNAIL: ") {
+                thumbnailGenerator = lines[i].substring(13);
+                continue;
+              }
+              if (lines[i].substring(0, 17) == "ORTHUMBNAILSIZE: ") {
+                thumbnailSize = lines[i].substring(17).split(',');
+                continue;
+              }
+              if (lines[i].substring(0, 6) == "NOTEXT") {
+                notextValue = true;
+                continue;
+              }
+              if (lines[i].substring(0, 15) == "SEARCHBASEDIR: ") {
+                searchBaseDir = lines[i].substring(15);
+                continue;
+              }
+              var data = lines[i].split(',');
+              if (data.length != 3 && 
+                  (data.length < 6 ||
+                  data.length > 8)) continue;
+              var newOption = {thumb: thisOpt.thumbSubmenu ? 
+                                        thisOpt.thumbSubmenu : thisOpt.thumb,
+                               text: data[0], 
+                               notext: notextValue, 
+                               checkbox: false, 
+                               longitude: parseFloat(data[1]), 
+                               latitude: parseFloat(data[2]), 
+                               zoomCallback: function() {
+                                 map.setCenter(
+                                     new google.maps.LatLng(this.latitude, 
+                                                            - this.longitude));
+                                 map.setZoom(
+                                     thisOpt.gotoZoom ?  thisOpt.gotoZoom : 13);
+                               }};
+              if (data.length >= 6) {
+                newOption.thumb = [thumbsFolder + data[3], data[4], data[5]];
+              }
+              else {
+                if (thumbnailGenerator !== null && 
+                    thumbnailSize.length == 2) {
+                  newOption.thumb = [thumbsFolder + eval(thumbnailGenerator), thumbnailSize[0], 
+                                     thumbnailSize[1]];
+                }
+              }
+              if (data.length >= 7) {
+                newOption.searchKml = searchBaseDir + data[6];
+                newOption.searchZoom = (data.length >= 8) ? parseInt(data[7]) : 7;
+                newOption.searchCallback = function() {
+                  if (/\.km[l|z]$/.test(this.searchKml)) {
+                    updateKml(this.searchKml, false, this.text, true, this.searchZoom);
+                  } else {
+                    window.open(this.searchKml);
+                  }
+                };
+              } else {
+                newOption.searchCallback = false;
+              }
+              skyContentMenu[submenu]['options'].push(newOption);
+            }
+            skyContentMenu[submenu]['headText'] += thisOpt.slideHtml;
+          }
+          createSlide(submenu);
+        } else {
+          alert('Menu not available yet, sorry...');
+          return;
+        }
+      });
+    } else {
+      if (skyContentMenu[submenu]) {
+        createSlide(submenu);
+      }
+      else {
+        alert('Menu not available yet, sorry...');
+      }
+    }
+  } else {
+    if (thisOpt.searchCallback) {
+      thisOpt.searchCallback();
+    } else {
+      if (thisOpt.zoomCallback) {
+        thisOpt.zoomCallback();
+      } else {
+        try {
+          var check = document.getElementById('check' + mIndex + '_' + oIndex);
+          check.checked = !check.checked;
+          checkChange(check, mIndex, oIndex);
+        } catch(ex) {
+          checkChange(undefined, mIndex, oIndex);
+        }
+      }
+    }
+  }
+}
+function mOverSlide(text, mIndex, oIndex) {
+  try {
+    var slider = document.getElementById('slider');
+    if ('left' == 'left')
+      slider.className = (/safari/ig.test(navigator.userAgent.toLowerCase())) ? "sliderNoScroll" : "sliderScroll";
+    var imgSlide = document.getElementById('FSIMG' + mIndex + '_' + oIndex);
+    var posImg = getPosition(imgSlide);
+    
+    if (mIndex != 1) {  // Request, no tooltip in menu 1
+      var myTooltip = document.getElementById('myTooltip');
+      myTooltip.style.visibility = 'visible'; myTooltip.style.display = 'block';
+      myTooltip.innerHTML = unescape(text);
+      var myTooltipPos = getPosition(myTooltip);
+      if ('left' == 'right' && /msie/ig.test(navigator.userAgent.toLowerCase())) {
+        myTooltip.style.left = px(0);
+      } else {
+        myTooltip.style.left = px(Math.max(0, posImg.left - slider.scrollLeft + posImg.width / 2 - myTooltipPos.width / 2));
+      }
+      myTooltip.style.top = px(posImg.top - myTooltipPos.height - 2);
+    } else {
+      var dt = document.getElementById('DT' + mIndex + '_' + oIndex);
+      dt.style.opacity = '1';
+      dt.style.filter = 'alpha(opacity=100)';
+    }
+
+    imgSlide.style.opacity = '1';
+    imgSlide.style.filter = 'alpha(opacity=100)';
+  } catch (ex) {
+  }
+}
+function mOutSlide(mIndex, oIndex) {
+  try {
+    var imgSlide = document.getElementById('FSIMG' + mIndex + '_' + oIndex);
+    var posImg = getPosition(imgSlide);
+    imgSlide.style.opacity = '0.75';
+    imgSlide.style.filter = 'alpha(opacity=75)';
+
+    if (mIndex != 1) {  // Request, no tooltip in menu 1
+      var myTooltip = document.getElementById('myTooltip');
+      myTooltip.style.visibility = 'hidden'; myTooltip.style.display = 'none';
+    } else {
+      var dt = document.getElementById('DT' + mIndex + '_' + oIndex);
+      dt.style.opacity = '0.75';
+       dt.style.filter = 'alpha(opacity=75)';
+    }
+  } catch (ex) {
+  }
+}
+function createSlide(menuNumber) {
+  currentMenuSlide = menuNumber;
+  function getTdFromOption(option, mIndex, oIndex) {
+    var slideCol0 = {}; //  I had a better code but IE wouldn't work...
+    var slideCol1 = {};
+    var thumb = option.thumb;
+    var checkBox = '';
+    var opacity = '';
+
+    if (option.checkbox) {
+      var checked = option.checkboxStatus() ? 'checked' : '';
+      checkBox = '<td><input type="checkbox" onClick="checkChange(this, ' + 
+                     mIndex + ', ' + oIndex + ');" id="check' + mIndex + '_' + 
+                     oIndex + '" ' + checked + '></td>';
+    }
+    if (option.opacitySlide) {
+      opacity = '<td><div class="slider" id="_sl' + oIndex + '" style="margin:0px; width: 70px;background-color: #000000;"></div></td><td><input class="slider-input" style="text-align:right;width:30px;display:none;visibility:hidden;" name="_sl' + oIndex + 'v" id="_sl' + oIndex + 'v"></td>';
+    }
+
+    var linkSpan = '<span class="spanLink" style="text-decoration:none;" ' + 'onClick="clickedMenu(' + 
+                   mIndex + ', ' +  oIndex + ');" onMouseOver="mOverSlide(\'' +
+                   escape(option.text) + '\', ' + mIndex + ', ' +  oIndex + 
+                   ');" onMouseOut="mOutSlide(' + mIndex + ', ' +  oIndex + ');">';
+    var leftWidth = px(oIndex * 75);  // Ad-hoc, fix later...
+    var divInsteadOfTT = menuNumber == 1 ? '<div id="DT' + mIndex + '_' +  oIndex + '" style="position:absolute;top:59px;width:70px;left:' + leftWidth + ';font-size:11px;overflow:hidden;opacity:0.75;filter:alpha(opacity=75);text-decoration:none;">' + option.text + '</div>' : '';
+    slideCol0.innerHTML = linkSpan + '<img src="' + thumb[0] + '" width="' + 
+                          thumb[1] + '" id="FSIMG' + mIndex + '_' +  oIndex + 
+                          '"height="' + thumb[2] + '" style="opacity:0.75;filter:alpha(opacity=75);">' + 
+                          divInsteadOfTT + '</span>';
+    slideCol0.align = 'center';
+    if (option.notext)
+      slideCol1.innerHTML = '<table><tr valign="top">' + checkBox + opacity + '</tr></table>';
+    else 
+      slideCol1.innerHTML = '<table><tr>' + checkBox + opacity + '</tr></table>' + linkSpan + option.text + '</span>';
+    slideCol1.align = 'center';
+    return [slideCol0, slideCol1];
+  }
+  var menu = skyContentMenu[menuNumber];
+  var slider = document.getElementById('slider');
+  var infoTab = document.getElementById('infoTab');
+  var slideTable = document.createElement('table');
+  slideTable.className = "slideTable";
+  var slideRow0 = slideTable.insertRow(slideTable.rows.length);
+  var slideRow1 = slideTable.insertRow(slideTable.rows.length);
+  slider.innerHTML = "";
+  slider.style.visibility = "visible";
+  slider.style.display = "block";
+  infoTab.innerHTML = "";
+  // Patch, feature request, get rid of this in menu 1
+  if (/safari/ig.test(navigator.userAgent.toLowerCase())) {
+    infoTab.style.visibility = "visible";
+    infoTab.style.display = "block";
+    infoTab.style.width = (menuNumber != 1) ? '250px' : '0px';
+  } else {
+    if (menuNumber == 1) {
+      infoTab.style.visibility = "hidden";
+      infoTab.style.display = "none";
+    } else {
+      infoTab.style.visibility = "visible";
+      infoTab.style.display = "block";
+    }
+  }
+  // Planet overlay only in menu 2
+  if (menuNumber != 2 && planetKmlOverlay !== null) {
+    planetKmlOverlay.setMap(null);
+    planetKmlOverlay = null;
+  }
+  // Constellations overlay in menu 3
+  if (constOverlay == null) {
+    constOverlay = new google.maps.KmlLayer(
+        {preserveViewport: true, url: constellationsKml});
+  }
+  if (menuNumber == 3) {
+    constOverlay.setMap(map);
+  } else {
+    constOverlay.setMap(null);
+  }
+  slider.style.left = px(getPosition(infoTab).width);
+  slider.style.width = px(getWindowWidth() - getPosition(infoTab).width);
+  slider.scrollLeft = 0;
+  for (var i = 0; i < menu['options'].length; i++) {
+    var aCol = getTdFromOption(menu['options'][i], menuNumber, i);
+    var col0I = slideRow0.insertCell(slideRow0.cells.length);
+    var col1I = slideRow1.insertCell(slideRow1.cells.length);
+    col0I.innerHTML = aCol[0].innerHTML;
+    col0I.align = aCol[0].align;
+    col0I.className = (menuNumber == 1) ? 'tdSpaced' : '';
+    col1I.innerHTML = aCol[1].innerHTML;
+    col1I.align = aCol[1].align;
+    col1I.className = 'tdSpaced';
+  }
+  if (menu['headText']) {
+    var headNode = document.createElement('span');
+    headNode.innerHTML = menu['headText'];
+    infoTab.appendChild(headNode);
+  }
+  slider.appendChild(slideTable);
+  if (menu['footText']) {
+    var footNode = document.createElement('p');
+    footNode.innerHTML = menu['footText'];
+    slider.appendChild(footNode);
+  }
+  if (menuNumber == 1) {  // Fix DT Positions
+    for (var i = 0; i < menu['options'].length; i++) {
+      try {
+        var dt = document.getElementById('DT' + menuNumber + '_' + i);
+        var dtp = getPosition(dt);
+        var fs = getPosition(document.getElementById('FSIMG' + menuNumber + '_' + i));
+        dt.style.left = px(fs.left);
+        dt.style.top = px(fs.height - dtp.height + 16);
+      } catch(ex) {
+      }
+    }
+  }
+  try {
+    var possibleSliders = ['Spitzer', 'ChandraXO', 'Galex'];
+    for (var i = 0; i < possibleSliders.length; i++) {
+      try {
+        var sl = document.getElementById('_sl' + possibleSliders[i]);
+        var slv = document.getElementById('_sl' + possibleSliders[i] + 'v');
+        var s = new Slider(sl, slv, "horizontal", null, i);
+        s.setMaximum(100);
+        if (!skyLayerManager.getOverlayVisibility(possibleSliders[i])) {
+          skyLayerManager.cOverlay(possibleSliders[i]);
+        }
+        s.setValue(skyLayerManager.getOverlayOpacity(possibleSliders[i]));
+        s.onchange = function() {
+          skyLayerManager.setOpacity(possibleSliders[this._oIndex], this.getValue());
+        };
+        skyLayerManager.setSlider(possibleSliders[i], s);
+      } catch(ex) {
+        continue;
+      }
+    }
+  } catch(ex) { }
+  if (menu['evalCode']) 
+    eval(menu['evalCode']);
+}

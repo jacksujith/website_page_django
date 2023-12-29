@@ -1,0 +1,359 @@
+html, body {
+  height: 100%;
+  margin: 0px;
+  overflow: hidden;
+  font-family: Arial,sans-serif;
+  background-color: #000;
+  color: #000;
+}
+.tdSpaced {
+  padding-left: 15px;
+  padding-right: 15px;
+}
+.examplegiven {
+  color: #ffaa00;
+}
+.examplegiven a {
+  color: #ffaa00;
+  text-decoration: underline;
+}
+.purplelink:link {
+  color: #ffaa00;
+  text-decoration: underline;
+}
+.purplelink:visited {
+  color: #ffaa00;
+  text-decoration: underline;
+}
+.purplelink:active {
+  color: #ffaa00;
+  text-decoration: underline;
+}
+.thispage {
+  color: #ffffff;
+  text-decoration: bold;
+}
+#hbar {
+  font-family: Arial,sans-serif;
+  font-size: 12px;
+  padding: 4px;
+  color: #7777aa;
+  border: #77a solid 0px;
+  border-bottom-width: 1px;
+  width: 100%;
+}
+td { 
+  font-family: Arial,sans-serif;
+}
+#search { 
+  font-size: small; 
+  white-space: nowrap; 
+  padding-left: 10px;
+}
+.searchsubmit {
+  background-color: #fff;
+  color: #333;
+}
+#searchtext { 
+  margin-right: 2px; 
+  background-color: #fff;
+  color: #333;
+}
+#searchtextT { 
+  margin-right: 2px; 
+  background-color: #fff;
+  color: #333;
+}
+#map { 
+  position: relative;
+  top: 0px;
+  left: 0px;
+}
+#page { 
+  width: 100%;
+  position: relative;
+  top: 0px;
+  left: 0px;
+}
+#header {
+  font-family: Arial,sans-serif;
+  font-size: small;
+}
+.sliderScroll {
+  position: absolute;
+  visibility: hidden;
+  left: 355px;
+  height: 90px;
+  width: 0px;
+  padding-top: 0px;
+  padding-bottom: 0px;
+  padding-left: 0px;
+  padding-right: 0px;
+  background-color: #000;
+  border: #77a solid 1px;
+  border-left-width: 0px;
+  font-size: 10px;
+  overflow: -moz-scrollbars-horizontal;
+  overflow-x: auto;
+  overflow-y: none;
+}
+.sliderNoScroll {
+  position: absolute;
+  visibility: hidden;
+  left: 355px;
+  height: 90px;
+  width: 0px;
+  padding-top: 0px;
+  padding-bottom: 0px;
+  padding-left: 0px;
+  padding-right: 0px;
+  background-color: #000;
+  border: #77a solid 1px;
+  border-left-width: 0px;
+  font-size: 10px;
+  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: hidden;
+}
+#infoTab {
+  position: absolute;
+  visibility: hidden;
+  left: 0px;
+  height: 90px;
+  width: 250px;
+  background-color: #000;
+  border: #77a solid 1px;
+  border-right-width: 1px;
+}
+#sliderHeader {
+  position: relative;
+  left: 0px;
+  top: 0px;
+}
+.sliderCross {
+  width: 100%;
+  text-align: right;
+  vertical-align: top;
+}
+#bar {
+  background-color: #444;
+  border: #77a solid 0px;
+  border-top-width: 1px;
+  border-bottom-width: 1px;
+  padding-bottom: 0px;
+  padding-right: 5px;
+  vertical-align: middle;
+}
+#bar .links {
+  padding-left: 5px;
+  font-size: 10px;
+}
+#bar .links a img {
+  border-width: 0px;
+  vertical-align: bottom;
+}
+#bar .links a span {
+  text-decoration: underline;
+  width: 16px;
+  height: 16px;
+  vertical-align: middle;
+}
+#downbar {
+  height: 0px;
+  position: absolute;
+  font-size: 12px;
+  background-color: #557;
+  border: #77a solid 0px;
+  border-top-width: 1px;
+  padding-bottom: 3px;
+  padding-right: 5px;
+  vertical-align: middle;
+}
+#downbar .links {
+  text-align: left;
+	padding-left: 5px;
+	height: 1em;
+}
+#downbar .links a {
+  text-decoration: none;
+}
+#downbar .links a img {
+  border-width: 0px;
+  vertical-align: bottom;
+}
+#downbar .links a span {
+  text-decoration: underline;
+  width: 16px;
+  height: 16px;
+  vertical-align: middle;
+}
+.fakeLink {
+  border: solid 0px;
+  background-color: #557;
+  color: blue;
+  width: 100%;
+  text-align: left;
+  text-decoration: underline;
+  cursor: pointer;
+  color: #aaaaee;
+}
+.fakeLinkW {
+  border: solid 0px;
+  background-color: #444;
+  color: #aaaaee;
+  width: 100%;
+  text-align: left;
+  font-size: 12px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.fakeLinkWS {
+  border: solid 0px;
+  background-color: #000;
+  color: #fff;
+  width: 100%;
+  font-size: 14px;
+  text-align: left;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.fakeLinkWSmall {
+  border: solid 0px;
+  background-color: #444;
+  color: #fff;
+  width: 100%;
+  text-align: left;
+  font-size: 10px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.smallWS {
+  border: solid 0px;
+  background-color: #000;
+  color: #fff;
+  width: 100%;
+  text-align: left;
+  text-decoration: bold;
+  cursor: pointer;
+}
+.fakeSpanW {
+  border: solid 0px;
+  background-color: #444;
+  width: 100%;
+  text-align: left;
+  color: #fff;
+}
+.scrolldiv { 
+  position: relative; 
+  left: 0px;
+  top: 0px; 
+  width: 400px;
+  height: 100px;
+  background-color: #444;
+  overflow: auto;
+}
+.imgLink {
+  color:blue;
+  cursor:pointer;
+}
+.spanLink {
+  color: #ffaa00;
+  cursor: pointer;
+  text-decoration: underline;
+  font-size: 14px;
+}
+.promoEarthNB {
+  border: solid 0px;
+  border-color: #999999;
+  background-color: #9b9c90;
+  text-align: left;
+  text-decoration: bold;
+  font-family: Verdana, Helvetica, sans-serif;
+  font-size: 10px;
+  color: #002211;
+}
+.promoEarth {
+  border: solid 1px;
+  border-color: #999999;
+  background-color: #9b9c90;
+  text-align: left;
+  text-decoration: bold;
+  font-family: Verdana, Helvetica, sans-serif;
+  font-size: 10px;
+  color: #002211;
+}
+.infoScrollBig {
+  background: white none repeat scroll 0%; overflow: auto; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial; position: relative; outline-color: invert; outline-style: none; outline-width: 0px;
+}
+.infoScroll {
+  background: white none repeat scroll 0%; overflow: hidden; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial; position: relative; outline-color: invert; outline-style: none; outline-width: 0px;
+}
+.slideTable {
+  padding: 0px;
+  padding-left: 0px;
+  padding-right: 0px;
+  padding-top: 0px;
+  padding-bottom: 0px;
+}
+.fakeDivDown {
+  border: solid 0px;
+  font-size: 12px;
+  background: transparent;
+  color: #000000;
+  width: 120px;
+  text-align: right;
+  color: #aaaaee;
+}
+.fakeDivDownB {
+  border: solid 0px;
+  font-size: 12px;
+  background: transparent;
+  color: #f00;
+  width: 240px;
+  text-align: left;
+  text-decoration: bold;
+}
+.quadtreeBoxButtonSelected {
+  cursor:pointer;border:1px solid #a7a7a7;background-color:white;color:black;
+  border-style: solid; border-color: rgb(52, 86, 132) rgb(108, 157, 223) rgb(108, 157, 223) rgb(52, 86, 132); 
+  border-width: 1px; font-size: 12px; font-weight: bold;
+  padding-bottom: 1px; padding-top: 1px;
+  padding-left: 3px; padding-right: 3px;
+}
+.quadtreeBoxButton {
+  cursor:pointer;border:1px solid #a7a7a7;background-color:white;color:black;
+  border-style: solid; border-color: white rgb(176, 176, 176) rgb(176, 176, 176) white; border-width: 1px; font-size: 12px;
+  padding-bottom: 1px; padding-top: 1px;
+  padding-left: 3px; padding-right: 3px;
+}
+html.mmfb #header-logo h1 {
+  font-family: "product sans", "open sans", arial, sans-serif;
+  font-weight: 400;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  white-space: nowrap
+}
+html.mmfb #header-logo h1 img[src$="googlelogo_color_116x41dp.png"] {
+  content: -webkit-image-set(url(//www.google.com/images/branding/googlelogo/1x/googlelogo_color_116x41dp.png) 1x, url(//www.google.com/images/branding/googlelogo/2x/googlelogo_color_116x41dp.png) 2x);
+  margin: 0 -8px -3px -1px;
+  vertical-align: middle;
+  width: 116px
+}
+html.mmfb #header-logo h1 a {
+  text-decoration: none
+}
+#header-logo h1 {
+  float: left;
+  font-size: 32px;
+  font-weight: 300;
+  line-height: 1.375;
+  margin: 0
+}
+[dir=rtl] #header-logo h1 {
+  float: right
+}
+#header-logo h1,
+#header-logo h1 a {
+  color: #fff
+}

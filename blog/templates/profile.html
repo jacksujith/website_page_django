@@ -1,0 +1,30 @@
+
+
+
+{% extends "index.html" %}
+{% block  content %}
+
+{% load static %}
+
+        <div class="container-fluid" style="margin-top:100;">
+            <div class="col-md-offser-4 col-md-4">
+              <table class="table table-bordered">
+                <tr>
+                    <h3 class="text-primary page-header text-center">User Details</h3>
+                </tr>
+                <tr>
+                    <th>User Name</th>
+                    <td>{{user.username}}</td>
+                </tr>
+                <tr>
+                    <th>Email Id</th>
+                    <td>{{user.email}}</td>
+                </tr>
+              </table>
+            </div>
+        </div>
+  
+  
+
+
+{% endblock  %}

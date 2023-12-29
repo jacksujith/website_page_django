@@ -1,0 +1,371 @@
+{% extends 'index.html' %}
+{% load static %}
+{% block content %} 
+{% if user.is_authenticated %}
+
+      <br>
+<div class="container">
+    <nav>
+        <h2 style=" color: #ff7200;  font-family: 'Times New Roman';  font-size: 50px;  padding-left: 1px; margin-top: 1%;  letter-spacing: 2px;">Welcome : {{user.username}}  </h2>
+    </nav>
+</div>
+      
+      <div id="home" class="container">
+        <div class="row">
+            <div class="col-6">
+               <div class="mt-5 p-5" >
+                <h2 style="font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; " >Devtech Information Technology and Services Private Limited</h2><br><br>
+                <marquee width="60%" direction="right" height="100px">
+                  <h3>.NET DEVELOPMENT SERVICES</h3>
+                  </marquee>
+                <br>
+
+                <marquee behavior="scroll" direction="left" scrollamount="5"><h4 style="text-shadow: 2px 2px #FF0000;"><img src="{% static 'img\icons8-android-phone-50.png' %}" alt="">MOBILE APP</h4></marquee><br>
+
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <marquee behavior="scroll" direction="right" scrollamount="5"><h4  style="text-shadow: 2px 2px #FF0000;"><img src="{% static 'img\coding.png' %}" width="10%" height="7%" alt="">&nbsp;WEB APP</h4></marquee><br>
+
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <marquee behavior="scroll" direction="left" scrollamount="5"><h4 style="text-shadow: 2px 2px #FF0000;"> <img src="{% static 'img\creativity.png' %}" alt="" width="10%" height="7%"> AUTOMATIONS</h4></marquee><br>
+
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <marquee behavior="scroll" direction="right" scrollamount="5"><h4 style="text-shadow: 2px 2px #FF0000;"> <img src="{% static 'img\seo.png' %}" alt="" width="10%" height="7%"> SEO/SMM</h4></marquee>
+            
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <marquee behavior="scroll" direction="left" scrollamount="5"><h4 style="text-shadow: 2px 2px #FF0000;"> <img src="{% static 'img\web-hosting.png' %}" alt="" width="10%" height="7%"> Hosting</h4></marquee>                    
+            
+               </div>
+            </div>
+            <div class="col-md-6 py-5 ">
+              <img src="{% static 'img\Data analysis-amico (1).png'%}" class="img-fluid" alt="#">
+            </div>
+        </div>
+    </div>
+    
+
+
+
+<p class="text-center h2" >Website/Windows Automation</p>
+<h3 class="text-center">BEST WEB/WINDOWS 
+  AUTOMATION COMPANY</h3> <br><br>
+    
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6">
+          <h2 class="text-center">About Me</h2><br>
+          <p> Selenium automates browsers. That's it! What you do with that power is entirely up to you. Primarily, 
+            it is for automating web applications for testing purposes, but is certainly not limited to just that.  
+            Boring web-based administration tasks can (and should!) be automated as well. .Selenium has the support 
+             of some of the largest browser vendors who have taken (or are taking) steps to make Selenium a native part of their browser. 
+             It is also the core technology in countless other browser automation tools, APIs and frameworks. </p> 
+        </div>
+        <div class="col-md-6">
+          <img src="{% static 'img\turn-on-2923046_1280.jpg' %}" width="500px" height="280px" alt="#">
+        </div>
+      </div>
+    </div>
+    <br><br>
+
+
+<section id="Projects">
+    <h2 class="text-center">Project Works</h2> <br><br>
+   
+    <div class="container">
+      <div class="row">
+        <div class="col-4 card" id="web developer" >
+          <img src="{% static 'img/pexels-vlada-karpovich-4050298.jpg' %}" width="100%" alt="#">
+         <div class="card-body">
+          <h3>Web Designing</h3>
+          <p>Blood Donation Management System.
+            Cooking Recipe Website.
+            Library Database Management System.
+            Online Retail Database Software.</p>
+        <button class="btn btn-outline-dark w-100"  style="background: #ff7200;">View Project</button>
+         </div>
+        </div>
+        <div class="col-4 card " id="python">
+
+
+          
+          <img src="{% static 'img\pexels-thisisengineering-3862132.jpg' %}" width="100%" alt="#">
+         <div class="card-body">
+          <h3>Python</h3>
+          <p>Flask, a backend this  of handling all the like me! I hope you've enjoyed my article on Flask as
+             a compact backend development tool for Python.</p>
+        <button class="btn btn-outline-dark w-100"  style="background: #ff7200;">View Project</button>
+         </div>
+        </div>
+        <div class="col-4 card" id="sql">
+        <img src="{% static 'img\pexels-thisisengineering-3861958.jpg' %}" alt="#">
+        <div class="card-body">
+          <h3>Sql</h3>
+          <p>A SQL project is a local representation of SQL objects that comprise the schema for a single database, 
+            such as tables, stored procedures, or functions..</p>
+        <button class="btn btn-outline-dark w-100"  style="background: #ff7200;">View Project</button>
+        </div>
+     
+      </div>
+      <br>
+      </div>
+    </div>
+    </div>
+  
+<br><br>
+  
+   <div class="container">
+     <div class="row">
+       <div class="col-4 card" id="web developer" >
+         <img src="{% static 'img/campaign-creators-gMsnXqILjp4-unsplash.jpg' %}" width="100%" alt="#">
+        <div class="card-body">
+         <h3>Angularjs</h3>
+         <p>Blood Donation Management System.
+           Cooking Recipe Website.
+           Library Database Management System.
+           Online Retail Database Software.</p>
+       <button class="btn btn-outline-dark w-100"  style="background: #ff7200;">View Project</button>
+        </div>
+       </div>
+       <div class="col-4 card " id="python">
+         
+         <img src="{% static 'img\pexels-sora-shimazaki-5926397.jpg' %}" width="100%" alt="#">
+        <div class="card-body">
+         <h3>.Net</h3>
+         <p>Flask, a backend this  of handling all the like me! I hope you've enjoyed my article on Flask as
+            a compact backend development tool for Python.</p>
+       <button class="btn btn-outline-dark w-100"  style="background: #ff7200;">View Project</button>
+        </div>
+       </div>
+       <div class="col-4 card" id="sql">
+       <img src="{% static 'img\alex-knight-2EJCSULRwC8-unsplash.jpg' %}" alt="#">
+       <div class="card-body">
+         <h3>Reactjs</h3>
+         <p>A SQL project is a local representation of SQL objects that comprise the schema for a single database, 
+           such as tables, stored procedures, or functions..</p>
+       <button class="btn btn-outline-dark w-100" style="background: #ff7200;">View Project</button>
+       </div>
+    
+     </div>
+     <br>
+     </div>
+   </div>
+   </div>
+     <br><br><br>
+    {% else %}
+       <h1> </h1>
+
+    {% endif %}
+  
+
+    
+
+
+    <div class="content">
+  <h1>Devtech Information <br><span>Technology &</span> <br>Services Private Limited</h1>
+      <p class="par">Lorem ipsum dolor sit amet consectetur adipisicing elit. Sunt neque 
+           expedita atque eveniet <br> quis nesciunt. Quos nulla vero consequuntur, fugit nemo ad delectus 
+          <br> a quae totam ipsa illum minus laudantium?</p>
+
+          <button class="cn"><a href="remo">JOIN US</a></button>
+
+
+
+
+
+
+
+
+
+
+
+
+<br><br>
+
+
+  
+      <div class="container">
+        <div class="row">
+          <div class="col-6">
+             <h4>Technologies I've Worked With</h4>
+          </div>
+        </div>
+      </div>  <br>
+      <div class="container">
+        <div class="row">
+          <div class="col-4">
+               <h4 class="text-center">Front-End</h4>
+            <div class="box">
+              <center><img src="{% static 'img\html-3640299.png' %}" width="60px" alt="#">
+              <img src="{% static 'img\css.png' %}" width="50px" alt="#">
+              <img src="{% static 'img\js.png' %}" width="40px" alt="#">
+            </center>
+              
+            </div>
+          </div>
+          <div class="col-4">
+            <h4 class="text-center">
+              Back-End
+            </h4>
+            <div class="box">
+              <center><img src="{% static 'img\python-5326385.png' %}" width="60px" alt="#">
+                <img src="{% static 'img\network.png' %}" width="50px" alt="#">
+                <img src="{% static 'img\mysql-7578013-7578013@0.png' %}" width="40px" alt="#">
+              
+            </div>
+          </div>
+          <div class="col-4">
+            <h4  class="text-center">Frame Work</h4>
+            <div class="box">
+              <center><img src="{% static 'img\angularjs.png' %}" width="60px" alt="#">
+                <img src="{% static 'img\react-js-4642758.png' %}" width="50px" alt="#">
+                <img src="{% static 'img\django.png' %}" width="40px" alt="#">
+            
+            
+            </div>
+          </div>
+        </div>
+      </div>
+    
+      </div> <br> <br> 
+   
+   
+     
+     
+     
+     
+     
+     
+     
+                                              
+    
+    
+      <br><br><br>
+      <section id="contact">
+       <div class="container">
+         <div class="row">
+           <div class="col-6 p-5">
+             <img src="{% static 'img\Get in touch-amico.png' %}" width="450px" height="450px" alt="#">
+   
+           </div>
+           <div class="col-6 p-5">
+             <h2>Contact Us</h2>
+   
+             <form>
+                
+               <div class="input-group mb-3">
+                 <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
+                 <input type="text" class="form-control" placeholder="enter your name" required>
+               </div>
+               <div class="input-group mb-3">
+                 <span class="input-group-text"><i class="fa-solid fa-envelope"></i></span>
+                 <input type="email" class="form-control" placeholder="enter your email" required>
+               </div>
+               <div class="input-group mb-3">
+                <span class="input-group-text"><i class="fa-solid fa-message"></i></span>
+                <textarea class="form-control" name="" id=""  cols="30" rows="10" placeholder="message ..."></textarea>
+               </div>
+               <input type="submit" class="btn btn-outline-dark px-5">
+   
+             </form>
+           </div>
+         </div>
+       </div>
+      </section><br><br><br>
+   
+    
+
+      <footer class="text-center text-lg-start bg-dark text-white">
+        <section class="container d-flex justify-content-center justify-content-lg-between p-4">
+          <div class="me-5 d-none d-lg-block">
+            <span>Get connected with us on social networks:</span>
+          </div>
+          <div>
+            <a href="" class="me-4 text-reset"><i class="fab fa-facebook"></i></a>
+            <a href="" class="me-4 text-reset"><i class="fab fa-twitter"></i></a>
+            <a href="" class="me-4 text-reset"><i class="fab fa-google"></i></a>
+            <a href="" class="me-4 text-reset"><i class="fab fa-instagram"></i></a>
+            <a href="" class="me-4 text-reset"><i class="fab fa-linkedin"></i></a>
+            <a href="" class="me-4 text-reset"><i class="fab fa-github"></i></a>
+          </div>
+        </section>
+      
+        <section class="">
+          <div class="container text-center text-md-start mt-5">
+            <div class="row mt-3">
+              <div class="col-md-3 col-lg-4 col-xl-3 mx-auto mb-4">
+                <h6 class="text-uppercase fw-bold mb-4"><i class="fa fa-cart-plus"></i> Devtech</h6>
+                <p>
+                  We are leading software company in Chennai. We are specialised in Windows, Mobile and Web application creations. We do Automation Tools using Selenium 
+                
+                </p>
+              </div>
+      
+              <div class="col-md-2 col-lg-2 col-xl-2 mx-auto mb-4">
+                <h6 class="text-uppercase fw-bold mb-4">Make Money with Us</h6>
+                <p><a href="#!" class="text-reset">Sell on  Website</a></p>
+                <p><a href="#!" class="text-reset">Advertise free Hosting</a></p>
+                <p><a href="#!" class="text-reset">Become an Affiliate</a></p>
+                <p><a href="#!" class="text-reset">Fulfilment by Devtecht</a></p>
+              </div>
+              <div class="col-md-3 col-lg-2 col-xl-2 mx-auto mb-4">
+                <h6 class="text-uppercase fw-bold mb-4">Useful links</h6>
+                <p><a href="#!" class="text-reset">FAQ</a></p>
+                <p><a href="#!" class="text-reset">Feedback</a></p>
+                <p><a href="#!" class="text-reset">About Us</a></p>
+                <p><a href="#!" class="text-reset">Contact Us</a></p>
+              </div>
+              
+              <div class="col-md-4 col-lg-3 col-xl-3 mx-auto mb-md-0 mb-4">
+                <h6 class="text-uppercase fw-bold mb-4"> Contact</h6>
+                <p><i class="fa fa-home"></i>Jack Sparrow sujith</p>
+                <p><i class="fa fa-envelope"></i> devtechnician2019@gmail.com</p>
+                <p><i class="fa fa-phone"></i> + 91 9043017689</p>
+              </div>
+      
+            </div>
+          </div>
+        </section>
+        <div class="text-center p-4">
+          &copy;  2021 Copyright <a class="text-reset fw-bold" href="https://devtechnician.com">devtech information technology</a>
+        </div>
+      </footer>
+    
+    
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+
+
+
+  
+  
+  
+  
+
+
+{% endblock %}

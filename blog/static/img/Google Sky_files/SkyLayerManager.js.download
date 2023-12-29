@@ -1,0 +1,185 @@
+// Copyright 2008 Google Inc.
+// All Rights Reserved.
+/**
+  * @fileoverview SkyLayerManager
+  * 
+  * @author  ( )
+  */
+
+/*
+  Sky layer manager class
+  Used to call and get values from a QuadtreeDisplay easily
+
+  @return {Object} this
+
+  @see quadtreeDisplay.js
+*/
+function SkyLayerManager(map) {
+  function createIcon(image) {
+    var icon = new GIcon(G_DEFAULT_ICON);
+    icon.image = image;
+    icon.iconSize = new Size(16, 16);
+    icon.iconAnchor = new Point(8, 8);
+    icon.shadowSize = new Size(0, 0);
+    return icon;
+  }
+  var me = this;
+  me.map = map;
+  me.sliders = {};
+  var tileBaseDir =
+      '//mw1.google.com/mw-planetary/sky/mapscontent_v1/overlayTiles/';
+  var tileBaseDirMatch =
+      '\\/\\/mw1\\.google\\.com\\/mw-planetary\\/sky\\/mapscontent_v1\\/' +
+      'overlayTiles\\/';
+  me.overlays = {'Spitzer':[tileBaseDir + 'spitzer/zoom{Z}/spitzer_{X}_{Y}.png', 0, false, undefined, 
+                            tileBaseDirMatch + 'spitzer\\/zoom\\d+\\/spitzer_\\d+_\\d+\\.png', 100, 0], 
+                 'ChandraXO':[tileBaseDir + 'chandracomp/zoom{Z}/chandracomp_{X}_{Y}.png', 0, false, undefined, 
+                              tileBaseDirMatch + 'chandracomp\\/zoom\\d+\\/chandracomp_\\d+_\\d+\\.png', 100, 1],
+                 'Galex':[tileBaseDir + 'galex/zoom{Z}/galex_{X}_{Y}.png', 0, false, undefined, 
+                          tileBaseDirMatch + 'galex\\/zoom\\d+\\/galex_\\d+_\\d+\\.png', 100, 2],
+                 'IRAS':[tileBaseDir + 'iras/zoom{Z}/iras_{X}_{Y}.png', 0, false, undefined, 
+                         tileBaseDirMatch + 'iras\\/zoom\\d+\\/iras_\\d+_\\d+\\.png', 100, 3],
+                 'WMAP':[tileBaseDir + 'wmap/zoom{Z}/wmap_{X}_{Y}.png', 0, false, undefined, 
+                         tileBaseDirMatch + 'wmap\\/zoom\\d+\\/wmap_\\d+_\\d+\\.png', 100, 4], 
+                 'Cassini':[tileBaseDir + 'cassini/zoom{Z}/cassini_{X}_{Y}.png', 0, false, undefined, 
+                            tileBaseDirMatch + 'cassini\\/zoom\\d+\\/cassini_\\d+_\\d+\\.png', 100, 5]};
+  for (overlay in me.overlays) {
+    me.map.overlayMapTypes.push(null);
+  }
+  return me;
+}
+
+SkyLayerManager.prototype.setSlider = function(overlay, slider) {
+  this.sliders[overlay] = slider;
+};
+
+SkyLayerManager.prototype.getOverlayVisibility = function(overlay) {
+  return this.overlays[overlay][2];
+};
+
+SkyLayerManager.prototype.getOverlayOpacity = function(overlay) {
+  return this.overlays[overlay][1];
+};
+
+SkyLayerManager.prototype.setOverlayVisibility = function(overlay, visible) {
+  try { var optionBox = document.getElementById('qtb' + overlay); }
+  catch(ex) { var optionBox = {className: ''}; }
+  if (visible) {
+    if (!this.overlays[overlay][3]) {
+      var urlTemplate = this.overlays[overlay][0];
+      var opacity = this.overlays[overlay][1] / 100;
+      var imageMapTypeOptions = {
+        getTileUrl: function(tile, zoom) {
+          var bound = Math.pow(2, zoom);
+          var x = tile.x;
+          var y = tile.y;
+          // Don't repeat across y-axis (vertically).
+          if (y < 0 || y >= bound) {
+            return null;
+          }
+          // Repeat across x-axis.
+          if (x < 0 || x >= bound) {
+            x = (x % bound + bound) % bound;
+          }
+
+          var is404 = true;
+          if (bBox[overlay][zoom] === undefined) return "";
+          for (var i = 0; i < bBox[overlay][zoom].length; i += 4) {
+            if (bBox[overlay][zoom][i] <= x && bBox[overlay][zoom][i + 1] >= x &&
+                bBox[overlay][zoom][i + 2] <= y && bBox[overlay][zoom][i + 3] >= y) {
+              is404 = false;
+              break;
+            }
+          }
+          if (is404) {
+            if (/safari/ig.test(navigator.userAgent.toLowerCase()))
+              return "images/img/transparent.gif";
+            return "";
+          }
+          var url = urlTemplate;
+          url = url.replace('{X}', x);
+          url = url.replace('{Y}', y);
+          return url.replace('{Z}', zoom);
+        },
+        opacity: opacity,
+        tileSize: new google.maps.Size(256,256)
+      };
+      this.overlays[overlay][3] = new google.maps.ImageMapType(
+          imageMapTypeOptions);
+      this.map.overlayMapTypes.setAt(this.overlays[overlay][6],
+                                     this.overlays[overlay][3]);
+      this.overlays[overlay][2] = true;
+      try { optionBox.className = 'quadtreeBoxButtonSelected'; } catch(ex) { }
+    }
+  } else {
+    this.map.overlayMapTypes.setAt(this.overlays[overlay][6], null);
+    this.overlays[overlay][3] = undefined;
+    this.overlays[overlay][2] = false;
+    try { optionBox.className = 'quadtreeBoxButton'; } catch(ex) { }
+  }
+};
+
+SkyLayerManager.prototype.cOverlay = function(overlay, opts) {
+  if (!this.overlays[overlay][2]) {
+    this.overlays[overlay][1] = this.overlays[overlay][5];
+    try {
+      if (parseInt(opts['maxZoom']) > 0 && this.map.getZoom() > parseInt(opts['maxZoom']))
+        this.map.setZoom(parseInt(opts['maxZoom']));
+    } catch (ex) {
+    }
+  } else {
+    this.overlays[overlay][1] = 0;
+  }
+  this.setOverlayVisibility(overlay, !this.overlays[overlay][2]);
+  try {
+    try {
+      var sliderTr = document.getElementById('_tr' + overlay);
+      sliderTr.style.display = this.overlays[overlay][2] ? 'block' : (opts['sliderVisible']?'block':'none');
+      sliderTr.style.visibility = this.overlays[overlay][2] ? 'visible' : (opts['sliderVisible']?'visible':'hidden');
+    } catch(ex) {
+    }
+    var slider = this.sliders[overlay];
+    slider.setValue(this.overlays[overlay][1]);
+  } catch(ex) {
+  }
+};
+
+SkyLayerManager.prototype.setOpacity = function(overlay, opacity, opts) {
+  this.overlays[overlay][1] = opacity;
+  if (opacity) {
+    this.overlays[overlay][5] = opacity;
+    try {
+      if (parseInt(opts['maxZoom']) > 0 && this.map.getZoom() > parseInt(opts['maxZoom']))
+        this.map.setZoom(parseInt(opts['maxZoom']));
+    } catch (ex) {
+    }
+    if (!this.overlays[overlay][3]) {
+      this.cOverlay(overlay);
+      return;
+    }
+  } else {
+    if (this.overlays[overlay][3]) {
+      this.overlays[overlay][5] = 100;
+      return;
+    }
+  }
+  if (this.overlays[overlay][3]) {
+    try {
+      var opac = (opacity / 100).toString();
+      var opacIE = 'alpha(opacity=' + opacity.toString() + ')';
+      this.overlays[overlay][3].setOpacity(parseFloat(opac));
+      var matching = new RegExp(this.overlays[overlay][4]);
+      for (var i in document.images) {
+        try {
+          if (matching.exec(document.images[i].src)) {
+            document.images[i].style.opacity = opac;
+            document.images[i].style.filter = opacIE;
+          }
+        } catch (ex) {
+        }
+      }
+    } catch (ex) {
+    }
+  }
+};
+

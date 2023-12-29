@@ -1,0 +1,58 @@
+
+
+
+{% extends "index.html" %}
+{% block  content %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+ <br><br> <h2 class="text-center">Devtech Information Technology</h2><br><br>
+
+
+
+
+    <div class="container p-5">
+      <div class="row">
+        <div class="col-md-6 well">
+          <img src="{% static 'img\Secure login-pana.png' %}" width="90%" height="100%" alt="">
+        </div>
+        <div class="col-md-6 well">
+          <h2 class="text-primary page-header text-center">Login</h2>
+        
+    <br>    
+            {% if messages %}
+            {% for messages in messages %}
+            <div class="alert alert-{{message.tags}}">
+              {{message}}
+            </div>
+            {% endfor %}
+            {% endif %}
+          
+            <form method="POST" autocomplete="off">
+              {% csrf_token %}
+              <h4>Get more things done with Loggin platform.</h4>
+              <p>Access to the most powerfull tool in the entire &nbsp;&nbsp;<i class="fa fa-check" style="font-size:24px"></i>
+                <br> design and web industry.</p>
+               
+
+                {{form | crispy}}
+               
+                <a href="https://www.facebook.com"><i class="fab fa-facebook"></i></a>&nbsp;&nbsp;
+                <a href="https://www.instagram.com"><i class="fab fa-instagram"></i></a>&nbsp;&nbsp;
+                <a href="https://www.google.com"><i class="fab fa-google"></i></a>&nbsp;&nbsp;
+                <a href="https://www.linkedin.com"><i class="fab fa-linkedin"></i></a>&nbsp;&nbsp;
+                <a href="https://www.github.com"><i class="fab fa-github"></i></a> &nbsp;&nbsp;
+                <a href="https://www.twitter.com"><i class="fab fa-twitter"></i></a><br><br>
+              
+               
+                Do You Have Already Create Account.. ?<br><br>
+                <button type="submit"  class="btn btn-success">Login</button>&nbsp;&nbsp;
+                <button class="btn"><a href='remo'>Signup</a></button>&nbsp;&nbsp;
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+
+{% endblock  %}

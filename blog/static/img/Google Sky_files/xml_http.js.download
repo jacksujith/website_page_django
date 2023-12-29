@@ -1,0 +1,106 @@
+/**
+ * Namespace for the XmlHttp functions.
+ */
+var XmlHttp = {};
+
+/**
+ * Returns an XMLHttp instance to use for asynchronous downloading. This method
+ * will never throw an exception, but will return null if the browser does not
+ * support XmlHttp for any reason.
+ *
+ * @return {ActiveXObject|XMLHttpRequest} A XMLHttp instance.
+ */
+XmlHttp.create = function() {
+  try {
+    if (typeof ActiveXObject != 'undefined') {
+      return new ActiveXObject('Microsoft.XMLHTTP');
+    } else if (window['XMLHttpRequest']) {
+      return new XMLHttpRequest();
+    }
+  } catch (e) {
+    // Do nothing.
+  }
+  return null;
+};
+
+/**
+ * Downloads the given URL and calls the callback when the download is complete.
+ * If the optional body parameter is specified, a POST request will be made to
+ * the specified URL; otherwise, a GET request will be issued.
+ *
+ * If the browser does not support XmlHttp, returns false. We do not catch
+ * exceptions, so, e.g., security errors will throw exceptions.  Callers should
+ * handle the possible/probable exceptions that are common with this method.
+ *
+ * @param {string} url The Url.
+ * @param {function(?string, number)} opt_callback The callback.
+ * @param {string} opt_body POST body.
+ * @param {string} opt_contentType Content type to use.
+ * @return {boolean} Whether the request to download from the given URL was
+ *     sent.
+ */
+XmlHttp.downloadUrl = function(url, opt_callback, opt_body, opt_contentType) {
+  var request = XmlHttp.create();
+  if (!request) {
+    return false;
+  }
+
+  if (opt_callback) {
+    request.onreadystatechange = function() {
+      if (request.readyState == 4) {
+        // Safely extract the .status and .responseText from the request
+        var statusAndResponseText = XmlHttp.getStatusAndResponse_(request);
+        var status = statusAndResponseText.status;
+        var responseText = statusAndResponseText.responseText;
+
+        opt_callback(responseText, status);
+        // In IE, assigning null to onreadystatechange throws a 'Type mismatch'
+        // exception. The value of the onreadystatechange property needs to be
+        // reset, however, because the function necessarily creates a references
+        // loop, because it must access the xmlhttp object, but this object is
+        // not passed as this to the handler function.
+        request.onreadystatechange = function() {};
+      }
+    };
+  }
+
+  if (opt_body) {
+    request.open('POST', url, true);
+    var contentType = opt_contentType;
+    // Sets the default content type if the value is undefined.
+    if (!contentType) {
+      contentType = 'application/x-www-form-urlencoded';
+    }
+    request.setRequestHeader('Content-Type', contentType);
+    request.send(opt_body);
+  } else {
+    request.open('GET', url, true);
+    request.send(null);
+  }
+  return true;
+};
+
+/**
+ * Safely extract the status and responseText from an XMLHttpRequest.
+ * @param {ActiveXObject|XMLHttpRequest} request An XMLHttpRequest.
+ * @return {{status: number, responseText: ?string}}
+ * @private
+ */
+XmlHttp.getStatusAndResponse_ = function(request) {
+  var status = -1;
+  var responseText = null;
+
+  try {
+    // If the request timed out, accessing request.status can trigger an
+    // exception, which the caller will not be able to catch.
+    status = request.status;
+    responseText = request.responseText;
+  } catch (e) {
+    // No need to do anything. Invalid values for status and responseText will
+    // be sent back to the caller.
+  }
+  return {
+    status: status,
+    responseText: responseText
+  };
+};
